@@ -1,0 +1,73 @@
+# ---------------------------------------------------------------------- #
+#                        DEPENDENCIES AND BUILD                          #
+# ---------------------------------------------------------------------- #
+
+# Node.js dependencies
+/node_modules
+
+# Production build output
+/dist
+/dist-ssr
+/build
+/out
+
+# NPM package manager lock files and cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+.yarn
+
+# ---------------------------------------------------------------------- #
+#                           ENVIRONMENT & SECRETS                          #
+# ---------------------------------------------------------------------- #
+
+# Environment files that may contain sensitive keys.
+# Keep them out of the repo and use template files (e.g., .env.example) instead.
+.env
+.env.local
+.env.*.local
+
+# ---------------------------------------------------------------------- #
+#                            EDITOR & OS FILES                             #
+# ---------------------------------------------------------------------- #
+
+# IDE/Editor temporary files and settings
+
+# VS Code
+.vscode/*
+# Re-include extensions.json and settings.json if you want to share workspace settings
+!.vscode/extensions.json
+# !.vscode/settings.json
+/temp
+
+# JetBrains/WebStorm/IntelliJ
+.idea
+
+# Operating System files (macOS/Windows)
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files created by various tools
+*.local
+
+# ---------------------------------------------------------------------- #
+#                                 VITE SPECIFIC                            #
+# ---------------------------------------------------------------------- #
+
+# Vite/Rollup cache
+.vite
+
+# ---------------------------------------------------------------------- #
+#                            HISTORY & UTILITY                             #
+# ---------------------------------------------------------------------- #
+
+# Auto-save/Local History folders from editors (THIS WAS YOUR MAIN ISSUE)
+.history/
