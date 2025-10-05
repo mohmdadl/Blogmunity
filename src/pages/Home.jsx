@@ -141,17 +141,18 @@ export default function Home({ isAuth }) {
 
                   <div className="card-actions justify-between items-center mt-4 border-t border-base-300 pt-4">
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLike(post.id, post.likes);
-                        }}
-                        className={`btn btn-circle btn-sm transition-all duration-300 ${
-                          hasLiked 
-                            ? "btn-primary text-white" 
-                            : "btn-ghost hover:btn-primary"
-                        }`}
-                      >
+                      {isAuth ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLike(post.id, post.likes);
+                          }}
+                          className={`btn btn-circle btn-sm transition-all duration-300 ${
+                            hasLiked 
+                              ? "btn-primary text-white" 
+                              : "btn-ghost hover:btn-primary"
+                          }`}
+                        >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5"
@@ -167,6 +168,32 @@ export default function Home({ isAuth }) {
                           />
                         </svg>
                       </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/login");
+                          }}
+                          className="btn btn-outline btn-sm gap-2"
+                          title="Login to like"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                            />
+                          </svg>
+                          <span className="text-xs">Login to like</span>
+                        </button>
+                      )}
                       <span className="font-bold text-lg">{post.likesCount || 0}</span>
                     </div>
 
