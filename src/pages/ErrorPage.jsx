@@ -1,9 +1,8 @@
 import React from "react";
-import { useNavigate, useRouteError } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export default function ErrorPage() {
+export default function ErrorPage({ error }) {
   const navigate = useNavigate();
-  const error = useRouteError();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-error/5 via-base-200 to-error/5 flex items-center justify-center px-4">
