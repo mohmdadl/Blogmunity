@@ -10,6 +10,7 @@ import Nav from "./components/Nav";
 import EditPost from "./pages/EditPost";
 import { ThemeProvider } from "./context/ThemeContext";
 import Profile from "./pages/Profile";
+import Welcome from "./pages/Welcome";
 
 function App() {
   const [isAuth, setIsAuth] = useState(
@@ -22,7 +23,6 @@ function App() {
   
 
 
-
   return (
     <ThemeProvider>
       <Router>
@@ -33,7 +33,8 @@ function App() {
           setPhotoURL={setPhotoURL}
         />
         <Routes>
-          <Route path="/" element={<Home isAuth={isAuth} />} errorElement={<ErrorPage />} />
+          <Route path="/" element={isAuth ? <Home isAuth={isAuth} /> : <Welcome />} errorElement={<ErrorPage />} />
+          <Route path="/posts" element={<Home isAuth={isAuth} />} errorElement={<ErrorPage />} />
           <Route path="/login" element={<Login setIsAuth={setIsAuth} setPhotoURL={setPhotoURL} />} errorElement={<ErrorPage />} />
           <Route path="/create-post" element={<CreatPost isAuth={isAuth}/>} errorElement={<ErrorPage />} />
           <Route path="/post/:id" element={<PostDetails isAuth={isAuth}/>} errorElement={<ErrorPage />} />
