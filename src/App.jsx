@@ -7,6 +7,7 @@ import PostDetails from "./pages/PostDetails";
 import NotFound from "./pages/NotFound";
 import ErrorPage from "./pages/ErrorPage";
 import Nav from "./components/Nav";
+import EditPost from "./pages/EditPost";
 
 function App() {
   const [isAuth, setIsAuth] = useState(
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login setIsAuth={setIsAuth} setPhotoURL={setPhotoURL} />} errorElement={<ErrorPage />} />
         <Route path="/create-post" element={<CreatPost isAuth={isAuth}/>} errorElement={<ErrorPage />} />
         <Route path="/post/:id" element={<PostDetails isAuth={isAuth}/>} errorElement={<ErrorPage />} />
+        <Route path="/post/:id/edit" element={<EditPost isAuth={isAuth} />} errorElement={<ErrorPage />} />
         <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -35,3 +37,4 @@ function App() {
 }
 
 export default App;
+
