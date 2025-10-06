@@ -26,7 +26,7 @@ export default function Login(props) {
       <div className="w-full max-w-[80%] flex items-center justify-center">
         <div className="card w-full max-w-md bg-base-100 shadow-2xl p-8 md:p-10 border border-base-300 rounded-2xl">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-black text-neutral mb-2 tracking-tight">
+            <h1 className="text-4xl font-black text-base-content mb-2 tracking-tight">
               Blogmunity
             </h1>
             <div className="h-1 bg-primary mx-auto rounded-full mb-4 w-24"></div>

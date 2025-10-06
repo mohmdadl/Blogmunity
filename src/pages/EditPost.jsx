@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { db, auth } from "../frebase-config";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { auth } from "../frebase-config";
+import { getPostById, updatePost } from "../services/posts";
+import { uploadImageToImgBB } from "../services/storage";
 
 export default function EditPost({ isAuth }) {
   const { id } = useParams();
@@ -29,13 +30,11 @@ export default function EditPost({ isAuth }) {
   useEffect(() => {
     const loadPost = async () => {
       try {
-        const postRef = doc(db, "posts", id);
-        const snap = await getDoc(postRef);
-        if (!snap.exists()) {
+        const data = await getPostById(id);
+        if (!data) {
           navigate("/");
           return;
         }
-        const data = snap.data();
         // Ownership check
         const currentUid = auth.currentUser?.uid;
         if (!currentUid || currentUid !== data.authorId) {
@@ -70,24 +69,11 @@ export default function EditPost({ isAuth }) {
 
   const uploadImage = async () => {
     if (!imageFile) return imageURL; // no change
-
     setUploading(true);
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
     try {
-      const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=5708d1b89a823acd41e8913fa44f24cc`,
-        { method: "POST", body: formData }
-      );
-      const data = await response.json();
+      const url = await uploadImageToImgBB(imageFile);
       setUploading(false);
-      if (data.success) {
-        return data.data.url;
-      } else {
-        setError("Failed to upload image to ImgBB");
-        return imageURL; // fallback to old image
-      }
+      return url;
     } catch (err) {
       setUploading(false);
       setError("Failed to upload image: " + err.message);
@@ -107,8 +93,7 @@ export default function EditPost({ isAuth }) {
     const newImageURL = await uploadImage();
 
     try {
-      const postRef = doc(db, "posts", id);
-      await updateDoc(postRef, {
+      await updatePost(id, {
         title: title.trim(),
         content: content.trim(),
         imageURL: newImageURL || "",

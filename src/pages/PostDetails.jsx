@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, increment } from "firebase/firestore";
-import { db, auth } from "../frebase-config";
+import { auth } from "../frebase-config";
+import { getPostById, deletePostById, toggleLike } from "../services/posts";
+import ImageViewer from "../components/ImageViewer";
 
 export default function PostDetails({ isAuth }) {
   const { id } = useParams();
@@ -9,14 +10,13 @@ export default function PostDetails({ isAuth }) {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deletePostId, setDeletePostId] = useState(null);
+  const [imageOpen, setImageOpen] = useState(false);
 
   useEffect(() => {
     const getPost = async () => {
-      const postDoc = doc(db, "posts", id);
-      const postData = await getDoc(postDoc);
-      
-      if (postData.exists()) {
-        setPost({ ...postData.data(), id: postData.id });
+      const data = await getPostById(id);
+      if (data) {
+        setPost(data);
       } else {
         navigate("/");
       }
@@ -26,43 +26,21 @@ export default function PostDetails({ isAuth }) {
   }, [id, navigate]);
 
   const handleLike = async () => {
-    if (!isAuth) {
-      navigate("/login");
-      return;
-    }
-
+    if (!isAuth) { navigate("/login"); return; }
     const userId = auth.currentUser?.uid;
-    const postRef = doc(db, "posts", id);
     const hasLiked = post.likes?.includes(userId);
-
+    await toggleLike(id, post.likes);
     if (hasLiked) {
-      await updateDoc(postRef, {
-        likes: arrayRemove(userId),
-        likesCount: increment(-1),
-      });
-      setPost({
-        ...post,
-        likes: post.likes.filter(id => id !== userId),
-        likesCount: post.likesCount - 1
-      });
+      setPost({ ...post, likes: post.likes.filter(x => x !== userId), likesCount: (post.likesCount || 0) - 1 });
     } else {
-      await updateDoc(postRef, {
-        likes: arrayUnion(userId),
-        likesCount: increment(1),
-      });
-      setPost({
-        ...post,
-        likes: [...(post.likes || []), userId],
-        likesCount: (post.likesCount || 0) + 1
-      });
+      setPost({ ...post, likes: [...(post.likes || []), userId], likesCount: (post.likesCount || 0) + 1 });
     }
   };
 
   const confirmDelete = async () => {
     if (deletePostId) {
       try {
-        const postRef = doc(db, "posts", deletePostId);
-        await deleteDoc(postRef);
+        await deletePostById(deletePostId);
         navigate("/");
       } catch (error) {
         console.error("Error deleting post:", error);
@@ -103,7 +81,9 @@ export default function PostDetails({ isAuth }) {
               <img
                 src={post.imageURL}
                 alt={post.title}
-                className="w-full max-h-96 object-cover"
+                className="w-full max-h-96 object-cover cursor-zoom-in"
+                onClick={() => setImageOpen(true)}
+                title="Click to view full image"
               />
             </figure>
           )}
@@ -111,7 +91,7 @@ export default function PostDetails({ isAuth }) {
           <div className="card-body p-8 md:p-12">
             {/* Header with Title and Edit/Delete (author only) */}
             <div className="flex justify-between items-start mb-4">
-              <h1 className="text-4xl font-black text-neutral flex-1">
+              <h1 className="text-4xl font-black text-base-content flex-1">
                 {post.title}
               </h1>
               {auth.currentUser?.uid === post.authorId && (
@@ -140,7 +120,11 @@ export default function PostDetails({ isAuth }) {
             </div>
 
             {/* Author Info */}
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-base-300">
+            <div 
+              className="flex items-center gap-3 mb-6 pb-6 border-b border-base-300 cursor-pointer"
+              onClick={() => navigate(`/profile/${post.authorId}`)}
+              title={`View ${post.authorName}'s profile`}
+            >
               {post.authorPhoto ? (
                 <div className="avatar">
                   <div className="w-12 h-12 rounded-full ring-2 ring-primary ring-offset-2">
@@ -239,6 +223,13 @@ export default function PostDetails({ isAuth }) {
           <div className="modal-backdrop" onClick={() => setDeletePostId(null)}></div>
         </div>
       )}
+      {/* Fullscreen Image Viewer */}
+      <ImageViewer
+        src={post.imageURL}
+        alt={post.title}
+        open={imageOpen}
+        onClose={() => setImageOpen(false)}
+      />
     </div>
   );
 }

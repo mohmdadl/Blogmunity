@@ -1,7 +1,8 @@
 import React, { useState , useEffect } from "react";
-import{addDoc, collection} from "firebase/firestore";
-import { db, auth } from "../frebase-config";
+import { auth } from "../frebase-config";
 import { useNavigate } from "react-router-dom";
+import { uploadImageToImgBB } from "../services/storage";
+import { createPost as createPostService } from "../services/posts";
 
 export default function CreatPost({isAuth}) {
   const [title, setTitle] = useState("");
@@ -11,33 +12,15 @@ export default function CreatPost({isAuth}) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const postRef = collection(db, "posts");
   let navigate = useNavigate();
 
   const uploadImage = async () => {
     if (!imageFile) return "";
-
     setUploading(true);
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
     try {
-      const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=5708d1b89a823acd41e8913fa44f24cc`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const data = await response.json();
+      const url = await uploadImageToImgBB(imageFile);
       setUploading(false);
-      
-      if (data.success) {
-        return data.data.url;
-      } else {
-        setError("Failed to upload image to ImgBB");
-        return "";
-      }
+      return url;
     } catch (err) {
       setUploading(false);
       setError("Failed to upload image: " + err.message);
@@ -46,7 +29,7 @@ export default function CreatPost({isAuth}) {
     }
   };
 
-  const createPost = async () => {
+  const handleCreatePost = async () => {
     // Validation
     if (!title.trim() || !content.trim()) {
       setError("Title and content cannot be empty!");
@@ -60,17 +43,7 @@ export default function CreatPost({isAuth}) {
       uploadedImageURL = await uploadImage();
     }
 
-    await addDoc(postRef, {
-      title,
-      content,
-      imageURL: uploadedImageURL,
-      authorName: auth.currentUser.displayName,
-      authorId: auth.currentUser.uid,
-      authorPhoto: auth.currentUser.photoURL || "",
-      likes: [],
-      likesCount: 0,
-      createdAt: new Date(),
-    });
+    await createPostService({ title, content, imageURL: uploadedImageURL });
     navigate("/");
   };
 
@@ -205,7 +178,7 @@ export default function CreatPost({isAuth}) {
           {/* Post Button */}
           <div>
             <button
-              onClick={createPost}
+              onClick={handleCreatePost}
               disabled={uploading || !title.trim() || !content.trim()}
               className="btn btn-primary btn-lg w-full shadow-xl hover:shadow-2xl hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-300 font-bold text-lg border-none bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >

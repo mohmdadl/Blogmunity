@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth, provider } from "../frebase-config";
 import React from "react";
+import ThemeToggle from "./ThemeToggle";
 
 function Nav({ isAuth, setIsAuth, photoURL, setPhotoURL }) {
     
@@ -23,7 +24,10 @@ function Nav({ isAuth, setIsAuth, photoURL, setPhotoURL }) {
   return (
     <nav>
       <div className="navbar bg-neutral shadow-sm py-4 text-white">
-        <div className="flex-1"></div>
+        <div className="flex-1">
+          {/* Theme toggle */}
+          <ThemeToggle />
+        </div>
 
         <div className="navbar-center">
           <Link
@@ -63,14 +67,6 @@ function Nav({ isAuth, setIsAuth, photoURL, setPhotoURL }) {
                     className="justify-between text-base-content hover:bg-base-200"
                   >
                     Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/settings"
-                    className="text-base-content hover:bg-base-200"
-                  >
-                    Settings
                   </Link>
                 </li>
                 <li>
